@@ -8,10 +8,10 @@ It is built to *kill* bad ideas: enforced role separation eliminates confirmatio
 
 If you open this repo in **[Claude Code](https://claude.com/claude-code)** (or any agent that loads this project's skills), you don't need to learn any commands. Just type one of these:
 
-| Say this | Mode | Needs API keys? | Cost |
+| Say this | Mode | API keys | Cost |
 |---|---|---|---|
-| `evaluate this idea inline "<your idea>"` | **Inline** — the agent runs the whole 5-phase council *in the chat*, grounds it with live web search, and writes a focused `verdict.md` at the end. | **No** | Free (runs on your existing Claude plan) |
-| `evaluate this idea "<your idea>"` | **CLI** — runs the real `council` binary: deterministic state machine, live TUI, persisted `run.json`, cost meter. | **Yes** (`ANTHROPIC_API_KEY` + `TAVILY_API_KEY`) | Billed to your Anthropic API account |
+| `evaluate this idea inline "<your idea>"` | **Inline** — the agent runs the whole 5-phase council *in the chat* and writes a focused `verdict.md` at the end. | **None** | Free (runs on your existing Claude plan) |
+| `evaluate this idea "<your idea>"` | **CLI** — runs the real `council` binary: deterministic state machine, live TUI, persisted `run.json`, cost meter. | `ANTHROPIC_API_KEY` + `TAVILY_API_KEY` (Brave + GitHub optional) | Billed to your Anthropic API account |
 
 Examples:
 
@@ -21,6 +21,13 @@ evaluate this idea "an AI tool that auto-generates SOC2 evidence for B2B SaaS st
 ```
 
 The phrase is recognized by the **`evaluate-idea`** skill in `.claude/skills/` — it ships with the repo, so anyone who clones it gets the catchphrase for free. **Inline mode** is the zero-setup path: no keys, no build, nothing to bill. **CLI mode** is the full deterministic engine and is documented under [Setup](#setup) / [Usage](#usage) below.
+
+> **Which web search runs — and why your Tavily/GitHub keys aren't used inline.**
+> The two modes ground Phase 0 with *different* search mechanisms:
+> - **Inline** grounds with the **agent's own built-in `WebSearch`/`WebFetch`** (e.g. Claude Code's web search), which is covered by your Claude plan. It does **not** call Tavily or GitHub, so those keys are irrelevant here — that's exactly why inline needs no keys.
+> - **CLI** grounds with the compiled Researcher agent, which calls **Tavily** (primary search, Brave fallback) and **GitHub** (repo signals) — *this* is where your `TAVILY_API_KEY` and `GITHUB_TOKEN` are used.
+>
+> So if you set Tavily + GitHub keys and want them exercised, run the **CLI** form (`evaluate this idea "<idea>"` or `pnpm dev run "<idea>"`). Inline will still ground fine without them.
 
 ### What inline mode writes
 
